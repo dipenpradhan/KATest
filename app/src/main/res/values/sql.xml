@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <string name="sql_create_badges" translatable="false"><![CDATA[
+           CREATE TABLE IF NOT EXISTS Badges (
+
+    ]]></string>
+
+    <string name="sql_articles_all_with_related" translatable="false"><![CDATA[
+            SELECT a.*, t.publishedTimeStamp, ass.uRL AS imageUrl, p.name AS publisherName
+            FROM article a LEFT JOIN timestamp t ON a.article_id=t.articleId
+            LEFT JOIN asset ass ON ass.articleId=a.article_id
+            LEFT JOIN publisher p ON p.publisherKey=a.publisher
+            WHERE a.fetchedFrom=0
+            GROUP BY a.article_id
+            ORDER BY a.fetchedFrom ASC,sortNo ASC
+    ]]></string>
+
+    <string name="sql_video_articles_all" translatable="false"><![CDATA[
+            SELECT a.*, t.publishedTimeStamp, ass.uRL AS imageUrl,
+            assVid.uRL AS videoUrl,ar.articleStatus AS readStatus,
+            p.name AS publisherName
+            FROM videoarticle a LEFT JOIN timestamp t ON a.video_article_id=t.videoArticleId
+            LEFT JOIN asset ass ON ass.videoArticleId=a.video_article_id LEFT JOIN asset assVid ON assVid.videoArticleId=a.video_article_id
+            LEFT JOIN publisher p ON p.publisherKey=a.publisher
+            LEFT JOIN articlereadstatus ar ON ar.article_id=a.video_article_id
+            WHERE a.fetchedFrom=0 AND (t.publishedTimeStamp<=date(\'now\') AND t.expiryTimeStamp>date(\'now\'))
+            AND ass.assetType=\'IMG\' AND assVid.assetType=\'MPG\'
+            GROUP BY a.video_article_id
+            ORDER BY sortNo ASC
+    ]]></string>
+
+     <string name="sql_video_articles_all_with_related" translatable="false"><![CDATA[
+            SELECT a.*, t.publishedTimeStamp, ass.uRL AS imageUrl,
+            assVid.uRL AS videoUrl,
+            p.name AS publisherName
+            FROM videoarticle a LEFT JOIN timestamp t ON a.video_article_id=t.videoArticleId
+            LEFT JOIN asset ass ON ass.videoArticleId=a.video_article_id
+            LEFT JOIN asset assVid ON assVid.videoArticleId=a.video_article_id
+            LEFT JOIN publisher p ON p.publisherKey=a.publisher
+            WHERE a.fetchedFrom=0 AND (t.publishedTimeStamp<=date(\'now\') AND t.expiryTimeStamp>date(\'now\'))
+            AND ass.assetType=\'IMG\' AND assVid.assetType=\'MPG\'
+            GROUP BY a.video_article_id
+            ORDER BY a.fetchedFrom ASC,sortNo ASC
+     ]]></string>
+
+    <string name="sql_articles_all_for_guid" translatable="false"><![CDATA[
+            SELECT a.*, t.publishedTimeStamp, ass.uRL AS imageUrl, p.name AS publisherName,ar.articleStatus AS readStatus
+            FROM article a LEFT JOIN timestamp t ON a.article_id=t.articleId
+            LEFT JOIN asset ass ON ass.articleId=a.article_id
+            LEFT JOIN publisher p ON p.publisherKey=a.publisher
+            LEFT JOIN articlereadstatus ar ON ar.article_id=a.article_id
+            WHERE a.fetchKey=?
+            AND a.fetchedFrom=?
+            GROUP BY a.article_id
+            ORDER BY sortNo ASC
+    ]]></string>
+
+
+    <!--ORDER BY datetime(t.publishedTimeStamp) DESC</string>-->
+    <string name="sql_articles_all_for_guid_with_related" translatable="false"><![CDATA[
+            SELECT a.*, t.publishedTimeStamp, ass.uRL AS imageUrl, p.name AS publisherName
+            FROM article a LEFT JOIN timestamp t ON a.article_id=t.articleId
+            LEFT JOIN asset ass ON ass.articleId=a.article_id
+            LEFT JOIN publisher p ON p.publisherKey=a.publisher
+            WHERE a.fetchKey=? AND (a.fetchedFrom=1)
+            GROUP BY a.article_id
+            ORDER BY a.fetchedFrom ASC,sortNo ASC
+    ]]></string>
+
+
+
+     <string name="sql_video_articles_all_for_guid" translatable="false"><![CDATA[
+            SELECT a.*, t.publishedTimeStamp, ass.uRL AS imageUrl,
+            assVid.uRL AS videoUrl,ar.articleStatus AS readStatus,
+            p.name AS publisherName
+            FROM videoarticle a LEFT JOIN timestamp t ON a.video_article_id=t.videoArticleId
+            LEFT JOIN asset ass ON ass.videoArticleId=a.video_article_id
+            LEFT JOIN asset assVid ON assVid.videoArticleId=a.video_article_id
+            LEFT JOIN publisher p ON p.publisherKey=a.publisher
+            LEFT JOIN articlereadstatus ar ON ar.article_id=a.video_article_id
+            WHERE a.fetchKey=? AND ass.assetType=\'IMG\' AND assVid.assetType=\'MPG\'
+            AND a.fetchedFrom=? AND (t.publishedTimeStamp<=date(\'now\') AND t.expiryTimeStamp>date(\'now\'))
+            GROUP BY a.video_article_id
+            ORDER BY sortNo ASC
+     ]]></string>
+
+     <string name="sql_video_articles_all_for_guid_with_related" translatable="false"><![CDATA[
+            SELECT a.*, t.publishedTimeStamp, ass.uRL AS imageUrl,
+            assVid.uRL AS videoUrl,
+            p.name AS publisherName
+            FROM videoarticle a LEFT JOIN timestamp t ON a.video_article_id=t.videoArticleId
+            LEFT JOIN asset ass ON ass.videoArticleId=a.video_article_id
+            LEFT JOIN asset assVid ON assVid.videoArticleId=a.video_article_id
+            LEFT JOIN publisher p ON p.publisherKey=a.publisher
+            WHERE a.fetchKey=?
+            AND ass.assetType=\'IMG\' AND assVid.assetType=\'MPG\'
+            AND a.fetchedFrom=1 AND (t.publishedTimeStamp<=date(\'now\') AND t.expiryTimeStamp>date(\'now\'))
+            GROUP BY a.video_article_id
+            ORDER BY a.fetchedFrom ASC,sortNo ASC
+     ]]></string>
+
+    <string name="sql_related_articles_by_articleid" translatable="false"><![CDATA[
+            SELECT  relArt.*, ? AS sportName, thumbnailUrl AS imageUrl,ar.articleStatus as readStatus
+            FROM RelatedArticle relArt
+            LEFT JOIN articlereadstatus ar ON ar.article_id=relArt.articleId
+            WHERE relArt.toId=?
+            GROUP BY relArt.articleId
+            ORDER BY datetime(relArt.publishedTS) DESC
+    ]]></string>
+
+    <string name="sql_related_video_articles_by_videoarticleid" translatable="false"><![CDATA[
+            SELECT  relVideoArt.*, ? AS sportName, thumbnailUrl AS imageUrl,ar.articleStatus as readStatus
+            FROM RelatedVideo relVideoArt
+            LEFT JOIN articlereadstatus ar ON ar.article_id=relVideoArt.videoId
+            WHERE relVideoArt.toId=?
+            GROUP BY relVideoArt.videoId
+            ORDER BY datetime(relVideoArt.publishedTimeStamp) DESC
+    ]]></string>
+
+    <string name="sql_article_by_id" translatable="false"><![CDATA[
+            SELECT a.*, t.publishedTimeStamp, ass.uRL AS imageUrl, p.name AS publisherName
+            FROM article a LEFT JOIN timestamp t ON a.article_id=t.articleId
+            LEFT JOIN asset ass ON ass.articleId=a.article_id
+            LEFT JOIN publisher p ON p.publisherKey=a.publisher
+            WHERE a.article_id=?
+            GROUP BY a.article_id
+            ORDER BY sortNo ASC
+    ]]></string>
+
+    <string name="sql_video_article_by_id" translatable="false"><![CDATA[
+            SELECT a.*, t.publishedTimeStamp,ass.uRL AS imageUrl,
+            assVid.uRL AS videoUrl,
+            p.name AS publisherName
+            FROM videoarticle a LEFT JOIN timestamp t ON a.video_article_id=t.videoArticleId
+            LEFT JOIN asset ass ON ass.videoArticleId=a.video_article_id
+            LEFT JOIN asset assVid ON assVid.videoArticleId=a.video_article_id
+            LEFT JOIN publisher p ON p.publisherKey=a.publisher
+            WHERE a.video_article_id=?
+            AND ass.assetType=\'IMG\' AND (t.publishedTimeStamp<=date(\'now\') AND t.expiryTimeStamp>date(\'now\'))
+            AND assVid.assetType=\'MPG\'
+            GROUP BY a.video_article_id
+            ORDER BY sortNo ASC
+    ]]></string>
+
+    <string name="sql_next_prev_article_by_sortno_all" translatable="false"><![CDATA[
+            SELECT a.*, t.publishedTimeStamp, ass.uRL AS imageUrl, p.name AS publisherName
+            FROM article a LEFT JOIN timestamp t ON a.article_id=t.articleId
+            LEFT JOIN asset ass ON ass.articleId=a.article_id
+            LEFT JOIN publisher p ON p.publisherKey=a.publisher
+            WHERE (sortNo=?-1 OR sortNo=?+1) AND a.fetchedFrom=?
+            GROUP BY a.article_id
+            ORDER BY sortNo ASC
+    ]]></string>
+
+
+    <string name="sql_next_prev_video_article_by_sortno_all" translatable="false"><![CDATA[
+            SELECT a.*, t.publishedTimeStamp, ass.uRL AS imageUrl, p.name AS publisherName
+            FROM videoarticle a LEFT JOIN timestamp t ON a.video_article_id=t.videoArticleId
+            LEFT JOIN asset ass ON ass.videoArticleId=a.video_article_id
+            LEFT JOIN publisher p ON p.publisherKey=a.publisher
+            WHERE (sortNo=?-1 OR sortNo=?+1) AND a.fetchedFrom=?
+            AND ass.assetType=\'IMG\'
+            GROUP BY a.video_article_id
+            ORDER BY sortNo ASC
+    ]]></string>
+
+     <string name="sql_next_prev_article_by_sortno_for_guid" translatable="false"><![CDATA[
+            SELECT a.*, t.publishedTimeStamp, ass.uRL AS imageUrl, p.name AS publisherName
+            FROM article a LEFT JOIN timestamp t ON a.article_id=t.articleId
+            LEFT JOIN asset ass ON ass.articleId=a.article_id
+            LEFT JOIN publisher p ON p.publisherKey=a.publisher
+            WHERE (sortNo=?-1 OR sortNo=?+1) AND a.fetchedFrom=?
+            AND a.fetchKey=?
+            GROUP BY a.article_id
+            ORDER BY sortNo ASC
+     ]]></string>
+
+       <string name="sql_next_prev_video_article_by_sortno_for_guid" translatable="false"><![CDATA[
+            SELECT a.*, t.publishedTimeStamp, ass.uRL AS imageUrl, p.name AS publisherName
+            FROM videoarticle a LEFT JOIN timestamp t ON a.video_article_id=t.videoarticleId
+            LEFT JOIN asset ass ON ass.videoArticleId=a.video_article_id
+            LEFT JOIN publisher p ON p.publisherKey=a.publisher
+            WHERE (sortNo=?-1 OR sortNo=?+1) AND a.fetchedFrom=?
+            AND a.fetchKey=?
+            AND ass.assetType=\'IMG\'
+            GROUP BY a.video_article_id
+            ORDER BY sortNo ASC
+     ]]></string>
+
+     <string name="sql_next_article_id" translatable="false"><![CDATA[
+            SELECT a.id
+            FROM article a
+            WHERE (sortNo=?+1) AND a.fetchedFrom=?
+            AND a.fetchKey=?
+            GROUP BY a.article_id
+            ORDER BY sortNo ASC
+     ]]></string>
+
+    <string name="sql_search_keywords" translatable="false"><![CDATA[
+            SELECT * FROM searchtags where recent=null or recent=0 or recent=2
+    ]]></string>
+
+    <string name="sql_match_all" translatable="false"><![CDATA[
+            SELECT m.*,c.competitionName,t.tournamentName FROM match m
+            LEFT JOIN competition c on c._id=m.competitionGUID
+            LEFT JOIN tournament t on t._id=m.tournamentGUID
+            WHERE datetime(m.matchDateTime) >= datetime(?)
+            AND datetime(m.matchDateTime) <= datetime(?)
+            AND m.fetchedFrom=0 AND m.status NOT LIKE \'InProgress\'
+            AND m.sportkixSportGUID IN
+    ]]></string>
+
+        <string name="sql_match_all_for_today" translatable="false"><![CDATA[
+            SELECT m.*,c.competitionName,t.tournamentName FROM match m
+            LEFT JOIN competition c on c._id=m.competitionGUID
+            LEFT JOIN tournament t on t._id=m.tournamentGUID
+            WHERE (datetime(m.matchDateTime) >= datetime(?)
+            AND datetime(m.matchDateTime) <= datetime(?) OR m.status=\'InProgress\')
+            AND m.fetchedFrom=0
+            AND m.sportkixSportGUID IN
+    ]]></string>
+
+    <string name="sql_match_for_guid" translatable="false"><![CDATA[
+            SELECT m.*,c.competitionName,t.tournamentName FROM match m
+            LEFT JOIN competition c on c._id=m.competitionGUID
+            LEFT JOIN tournament t on t._id=m.tournamentGUID
+            WHERE datetime(m.matchDateTime) >= datetime(?)
+            AND datetime(m.matchDateTime) <= datetime(?)
+            AND m.fetchedFrom=?
+            AND m.fetchKey=?
+            AND m.status NOT LIKE \'InProgress\'
+            AND m.sportkixSportGUID IN
+    ]]></string>
+
+     <string name="sql_match_for_guid_for_today" translatable="false"><![CDATA[
+            SELECT m.*,c.competitionName,t.tournamentName FROM match m
+            LEFT JOIN competition c on c._id=m.competitionGUID
+            LEFT JOIN tournament t on t._id=m.tournamentGUID
+            WHERE (datetime(m.matchDateTime) >= datetime(?)
+            AND datetime(m.matchDateTime) <= datetime(?)  OR m.status=\'InProgress\')
+            AND m.fetchedFrom=?
+            AND m.fetchKey=?
+            AND m.sportkixSportGUID IN
+    ]]></string>
+
+     <string name="sql_single_match_for_databaseid" translatable="false"><![CDATA[
+            SELECT m.*,c.competitionName,t.tournamentName FROM match m
+            LEFT JOIN competition c on c._id=m.competitionGUID
+            LEFT JOIN tournament t on t._id=m.tournamentGUID
+            WHERE m._id=?
+    ]]></string>
+
+    <string name="sql_live_match_all" translatable="false"><![CDATA[
+            SELECT m.*,c.competitionName,t.tournamentName FROM match m
+            LEFT JOIN competition c on c._id=m.competitionGUID
+            LEFT JOIN tournament t on t._id=m.tournamentGUID
+            WHERE m.status=?
+            AND m.fetchedFrom=?
+            AND m.sportkixSportGUID IN
+
+    ]]></string>
+
+    <string name="sql_live_match_single" translatable="false"><![CDATA[
+            SELECT m.*,c.competitionName,t.tournamentName FROM match m
+            LEFT JOIN competition c on c._id=m.competitionGUID
+            LEFT JOIN tournament t on t._id=m.tournamentGUID
+            WHERE m.status=?
+            AND m.fetchedFrom=?
+            AND m.fetchKey=?
+            AND m.sportkixSportGUID IN
+
+    ]]></string>
+
+    <string name="sql_delete_related_articles" translatable="false"><![CDATA[
+        DELETE FROM RelatedArticle WHERE toId IN( SELECT _id FROM Article WHERE fetchedFrom=? );
+    ]]></string>
+
+    <string name="sql_delete_related_videos" translatable="false"><![CDATA[
+        DELETE FROM RelatedVideo WHERE toId IN( SELECT _id FROM videoarticle WHERE fetchedFrom=? );
+    ]]></string>
+
+    <string name="sql_delete_articles" translatable="false"><![CDATA[
+        DELETE FROM Article WHERE fetchedFrom=?
+    ]]></string>
+
+    <string name="sql_delete_videos" translatable="false"><![CDATA[
+        DELETE FROM videoarticle WHERE fetchedFrom=?
+    ]]></string>
+
+    <string name="sql_delete_matches" translatable="false"><![CDATA[
+        DELETE FROM match WHERE fetchedFrom=?
+    ]]></string>
+
+    <string name="sql_update_match" translatable="false"><![CDATA[
+        UPDATE match SET status=? , subStatus=? , resultSummary=? , matchData=? WHERE fetchedFrom=? AND liveMatchId=?
+    ]]></string>
+
+    <string name="sql_update_articles_sort_no_for_single" translatable="false"><![CDATA[
+        UPDATE Article SET sortNo=sortNo+? WHERE fetchedFrom=?
+    ]]></string>
+
+    <string name="sql_update_articles_sort_no_for_all" translatable="false"><![CDATA[
+        UPDATE Article SET sortNo=sortNo+? WHERE fetchedFrom=? AND fetchKey=?
+    ]]></string>
+
+    <string name="sql_articles_max_sort_no_for_all" translatable="false"><![CDATA[
+        SELECT MAX(sortNo) AS maxSortNo FROM article WHERE fetchedFrom=?
+    ]]></string>
+
+    <string name="sql_articles_max_sort_no_for_single" translatable="false"><![CDATA[
+        SELECT MAX(sortNo) AS maxSortNo FROM article WHERE fetchedFrom=? AND fetchKey=?
+    ]]></string>
+
+    <string name="sql_update_videos_sort_no_for_all" translatable="false"><![CDATA[
+        UPDATE VideoArticle SET sortNo=sortNo+? WHERE fetchedFrom=?
+    ]]></string>
+
+    <string name="sql_update_videos_sort_no_for_single" translatable="false"><![CDATA[
+        UPDATE VideoArticle SET sortNo=sortNo+? WHERE fetchedFrom=? AND fetchKey=?
+    ]]></string>
+
+    <string name="sql_videos_max_sort_no_for_all" translatable="false"><![CDATA[
+        SELECT MAX(sortNo) AS maxSortNo FROM VideoArticle WHERE fetchedFrom=?
+    ]]></string>
+
+    <string name="sql_videos_max_sort_no_for_single" translatable="false"><![CDATA[
+        SELECT MAX(sortNo) AS maxSortNo FROM VideoArticle WHERE fetchedFrom=? AND fetchKey=?
+    ]]></string>
+
+</resources>
